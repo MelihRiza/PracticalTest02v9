@@ -38,9 +38,15 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:hint="result"
             android:id="@+id/text_view_result">
         </TextView>
 
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Secondary Activity"
+            android:id="@+id/button_map"></Button>
 
 
     </LinearLayout>
