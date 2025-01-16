@@ -28,11 +28,9 @@ public class PracticalTest02SecondaryActivityv9 extends AppCompatActivity implem
 
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
-        // Center map on Ghelmegioaia, Romania
-        LatLng ghelmegioaia = new LatLng(44.615, 22.832); // Replace with accurate coordinates if needed
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(ghelmegioaia, 10));
+        LatLng ghelmegioaia = new LatLng(44.615, 22.832);
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(ghelmegioaia, 15));
 
-        // Add marker to Bucharest
         LatLng bucharest = new LatLng(44.4268, 26.1025);
         googleMap.addMarker(new MarkerOptions().position(bucharest).title("Marker in Bucharest"));
     }
