@@ -29,17 +29,24 @@ public class PracticalTest02MainActivityv9 extends AppCompatActivity {
 
     private static final String TAG = "PracticalTest02";
     private static final String BROADCAST_ACTION = "ro.pub.cs.systems.eim.practicaltest02v9.UPDATE_TEXTVIEW";
+    private static final String ACTION_UPDATE_UI = "ro.pub.cs.systems.eim.UPDATE_UI";
 
     EditText edit_text_word, edit_text_len;
     Button button_send, button_map;
     TextView text_view_result;
 
-    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver updateUIReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            String result = intent.getStringExtra("result");
-            Log.d(TAG, "Received result: " + result);
-            text_view_result.setText(result);
+            String[] result = intent.getStringArrayExtra("result");
+
+            // Transform the String[] to a single String
+            StringBuilder sb = new StringBuilder();
+            for (String s : result) {
+                sb.append(s).append("\n");
+            }
+
+            text_view_result.setText(sb.toString());
         }
     };
 
@@ -54,9 +61,6 @@ public class PracticalTest02MainActivityv9 extends AppCompatActivity {
         text_view_result = findViewById(R.id.text_view_result);
         button_map = findViewById(R.id.button_map);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            registerReceiver(broadcastReceiver, new IntentFilter(BROADCAST_ACTION), Context.RECEIVER_NOT_EXPORTED);
-        }
 
         button_send.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -71,17 +75,22 @@ public class PracticalTest02MainActivityv9 extends AppCompatActivity {
             }
         });
 
+        IntentFilter filter = new IntentFilter(ACTION_UPDATE_UI);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            registerReceiver(updateUIReceiver, filter, Context.RECEIVER_NOT_EXPORTED);
+        }
+
         button_map.setOnClickListener(view -> {
             Intent intent = new Intent(PracticalTest02MainActivityv9.this, PracticalTest02SecondaryActivityv9.class);
             startActivity(intent);
         });
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        unregisterReceiver(broadcastReceiver);
-    }
+//    @Override
+//    protected void onDestroy() {
+//        super.onDestroy();
+//        unregisterReceiver(broadcastReceiver);
+//    }
 
     private class FetchAnagramsTask extends AsyncTask<String, Void, String> {
 
@@ -131,10 +140,15 @@ public class PracticalTest02MainActivityv9 extends AppCompatActivity {
 
                     Log.d(TAG, "Filtered Anagrams: " + filteredAnagrams);
 
-                    // Send broadcast with the result
-                    Intent broadcastIntent = new Intent(BROADCAST_ACTION).setAction(getPackageName());
-                    broadcastIntent.putExtra("result", filteredAnagrams.toString());
-                    sendBroadcast(broadcastIntent);
+                    //Make the string an array
+                    String[] anagrams = new String[filteredAnagrams.size()];
+                    for (int i = 0; i < filteredAnagrams.size(); i++) {
+                        anagrams[i] = filteredAnagrams.get(i);
+                    }
+
+                    Intent intent = new Intent(ACTION_UPDATE_UI).setPackage(/* TODO: provide the application ID. For example: */ getPackageName());
+                    intent.putExtra("result", anagrams);
+                    sendBroadcast(intent);
 
                 } catch (Exception e) {
                     Log.e(TAG, "Error parsing JSON", e);
